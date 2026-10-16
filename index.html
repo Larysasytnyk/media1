@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медіаграмотність • Інтерактивна вправа</title>
+    <!-- Підключаємо Tailwind CSS для сучасного, світлого та стильного дизайну -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen py-10 px-4">
+
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
+        
+        <!-- Блок 1: Заголовок і опис вправи -->
+        <div class="mb-8">
+            <span class="text-xs font-semibold tracking-wider text-blue-600 uppercase">НУШ • Критичне мислення</span>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Медіаграмотність: Аналіз інформаційних викликів</h1>
+            <p class="text-slate-600 mt-2 text-sm md:text-base">
+                Оберіть життєву ситуацію, проаналізуйте її, запропонуйте кроки для перевірки інформації та надішліть результати на перевірку.
+            </p>
+        </div>
+
+        <!-- Форма для збору та відправки відповідей -->
+        <form action="https://formspree.io/f/maeqazql" method="POST">
+
+            <!-- Блок 2: Інтерактивний вибір ситуацій (кейсів) -->
+            <div class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-sm">01</span>
+                    <h2 class="text-lg font-semibold text-slate-900">Оберіть ситуацію (кейс)</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <label class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition-all bg-white block">
+                        <input type="radio" name="Обраний_кейс" value="Кейс 1: Сенсаційна новина без посилань" class="mb-2" required>
+                        <span class="text-xs font-bold text-slate-400 block mb-1">КЕЙС 01</span>
+                        <p class="text-sm font-medium text-slate-800">У чаті поширюють гучну «термінову» новину без жодних посилань на першоджерело.</p>
+                    </label>
+
+                    <label class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition-all bg-white block">
+                        <input type="radio" name="Обраний_кейс" value="Кейс 2: Прихована реклама у блогера" class="mb-2">
+                        <span class="text-xs font-bold text-slate-400 block mb-1">КЕЙС 02</span>
+                        <p class="text-sm font-medium text-slate-800">Популярний інфлюенсер нахвалює товар, але не вказує, що це партнерський матеріал.</p>
+                    </label>
+
+                    <label class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition-all bg-white block">
+                        <input type="radio" name="Обраний_кейс" value="Кейс 3: Маніпулятивне відео" class="mb-2">
+                        <span class="text-xs font-bold text-slate-400 block mb-1">КЕЙС 03</span>
+                        <p class="text-sm font-medium text-slate-800">Відеофрагмент із виступу викликає сумніви щодо контексту та правдивості.</p>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Блок 3: Поля вводу (textarea) для розгорнутих відповідей -->
+            <div class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-sm">02</span>
+                    <h2 class="text-lg font-semibold text-slate-900">Ваші кроки та аргументи</h2>
+                </div>
+                <p class="text-sm text-slate-600 mb-6">Опишіть алгоритм дій медіаграмотної людини у вибраній ситуації.</p>
+
+                <div class="border border-slate-200 rounded-xl p-5 mb-4 bg-slate-50/50">
+                    <div class="font-medium text-slate-900 text-sm mb-2">Крок 1: Що потрібно зробити насамперед?</div>
+                    <textarea name="Відповідь_Крок_1_Дія" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white mb-4" placeholder="Опишіть першу дію..." required></textarea>
+                    
+                    <div class="font-medium text-slate-900 text-sm mb-2">Навіщо це потрібно? (Мета кроку)</div>
+                    <textarea name="Відповідь_Крок_1_Мета" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white" placeholder="Поясніть, яку проблему це вирішує..." required></textarea>
+                </div>
+
+                <div class="border border-slate-200 rounded-xl p-5 mb-4 bg-slate-50/50">
+                    <div class="font-medium text
