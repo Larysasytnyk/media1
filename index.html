@@ -3,69 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Медіаграмотність • Інтерактивна вправа</title>
-    <!-- Підключаємо Tailwind CSS для сучасного, світлого та стильного дизайну -->
+    <title>Аналіз інцидентів кібербезпеки</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Функція для вибору кейсу (відкриває кроки 2 і 3)
+        function selectCase(caseId) {
+            // Ховаємо обидва описи
+            document.getElementById('desc-kyivstar').classList.add('hidden');
+            document.getElementById('desc-equifax').classList.add('hidden');
+            
+            // Показуємо потрібний опис
+            document.getElementById('desc-' + caseId).classList.remove('hidden');
+            
+            // Відкриваємо Крок 2 та Крок 3
+            document.getElementById('step2-and-3').classList.remove('hidden');
+            
+            // Заповнюємо приховане поле для чек-листа
+            const caseName = caseId === 'kyivstar' ? 'Злам системи «Київстар»' : 'Злам агенції Equifax';
+            document.getElementById('selected_case_input').value = caseName;
+
+            setTimeout(() => {
+                document.getElementById('step2-and-3').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        // Функція для перевірки заповнення висновку (відкриває крок 4)
+        function checkConclusion() {
+            const conclusionText = document.getElementById('conclusion-textarea').value.trim();
+            const step4 = document.getElementById('step-4');
+
+            if (conclusionText.length > 0) {
+                if (step4.classList.contains('hidden')) {
+                    step4.classList.remove('hidden');
+                    setTimeout(() => {
+                        step4.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
+            } else {
+                step4.classList.add('hidden');
+            }
+        }
+
+        // Логіка таймера зворотного відліку (25 хвилин = 1500 секунд)
+        let timerInterval = null;
+        let totalSeconds = 1500; 
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            document.getElementById('timer-display').innerText = 
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+
+        function startTimer() {
+            const teamInput = document.querySelector('input[name="Назва_команди"]').value.trim();
+            if (!teamInput) {
+                alert('Будь ласка, введіть назву команди перед початком виконання!');
+                document.querySelector('input[name="Назва_команди"]').focus();
+                return;
+            }
+
+            // Показуємо Крок 1 після натискання «Почати»
+            document.getElementById('step-1-container').classList.remove('hidden');
+
+            if (timerInterval) return;
+            
+            timerInterval = setInterval(() => {
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('Час виконання завдання вичерпано!');
+                }
+            }, 1000);
+
+            setTimeout(() => {
+                document.getElementById('step-1-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            totalSeconds = 1500;
+            updateTimerDisplay();
+            document.getElementById('step-1-container').classList.add('hidden');
+            document.getElementById('step2-and-3').classList.add('hidden');
+            document.getElementById('step-4').classList.add('hidden');
+        }
+
+        // Автоматичний підрахунок загальної кількості балів
+        function calculateTotalScore() {
+            let total = 0;
+            for (let i = 1; i <= 4; i++) {
+                const selected = document.querySelector(`input[name="Оцінка_Критерій_${i}"]:checked`);
+                if (selected) {
+                    total += parseInt(selected.value, 10);
+                }
+            }
+            document.getElementById('total-score-display').innerText = total + ' / 4';
+            document.getElementById('total_score_input').value = total;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('input[type="radio"][name^="Оцінка_Критерій_"]').forEach(radio => {
+                radio.addEventListener('change', calculateTotalScore);
+            });
+        });
+    </script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen py-10 px-4">
 
-    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-10">
         
-        <!-- Блок 1: Заголовок і опис вправи -->
+        <!-- Заголовок сторінки -->
         <div class="mb-8">
-            <span class="text-xs font-semibold tracking-wider text-blue-600 uppercase">НУШ • Критичне мислення</span>
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Медіаграмотність: Аналіз інформаційних викликів</h1>
-            <p class="text-slate-600 mt-2 text-sm md:text-base">
-                Оберіть життєву ситуацію, проаналізуйте її, запропонуйте кроки для перевірки інформації та надішліть результати на перевірку.
+            <span class="text-xs font-bold tracking-wider text-blue-600 uppercase">Мініпроєкт-розслідування</span>
+            <h1 class="text-2xl md:text-4xl font-bold text-slate-900 mt-2 leading-tight">Аналіз інцидентів кібербезпеки: від причини до захисту</h1>
+            <p class="text-slate-600 mt-3 text-sm md:text-base">
+                Ознайомтеся з реальними кібератаками, оберіть кейс для аналізу, заповніть експертну карту та сформулюйте висновок кіберполіції.
             </p>
         </div>
 
-        <!-- Форма для збору та відправки відповідей -->
+        <hr class="border-slate-100 mb-8">
+
         <form action="https://formspree.io/f/maeqazql" method="POST">
 
-            <!-- Блок 2: Інтерактивний вибір ситуацій (кейсів) -->
-            <div class="mb-8">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-sm">01</span>
-                    <h2 class="text-lg font-semibold text-slate-900">Оберіть ситуацію (кейс)</h2>
+            <!-- БЛОК КОМАНДИ ТА ТАЙМЕРА (ПЕРЕД КРОКОМ 1) -->
+            <div class="mb-8 bg-[#f3f0fb] p-6 rounded-2xl border border-[#e5def6] shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+                    <!-- Поле назви команди -->
+                    <div class="flex-grow flex items-center gap-3">
+                        <label class="text-lg font-bold text-slate-900 whitespace-nowrap">Команда</label>
+                        <input type="text" name="Назва_команди" class="w-full p-3.5 text-base bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:outline-none shadow-sm" placeholder="Назва або номер" required>
+                    </div>
+                    <!-- Циферблат таймера (25 хвилин) -->
+                    <div class="bg-[#bbf7d0] text-slate-900 font-mono font-bold text-2xl py-3 px-6 rounded-xl text-center shadow-inner tracking-wider min-w-[130px]" id="timer-display">
+                        25:00
+                    </div>
+                </div>
+
+                <!-- Кнопки керування таймером -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <button type="button" onclick="startTimer()" class="bg-[#bbf7d0] hover:bg-[#a3f4be] text-slate-900 font-bold px-6 py-3 rounded-xl text-base transition-colors shadow-sm cursor-pointer flex items-center gap-2">
+                        ▶ Почати
+                    </button>
+                    <button type="button" onclick="pauseTimer()" class="bg-white hover:bg-slate-100 text-slate-600 font-medium px-6 py-3 rounded-xl text-base border border-slate-200 transition-colors cursor-pointer">
+                        Пауза
+                    </button>
+                    <button type="button" onclick="resetTimer()" class="bg-white hover:bg-slate-100 text-slate-600 font-medium px-6 py-3 rounded-xl text-base border border-slate-200 transition-colors cursor-pointer">
+                        Нова спроба
+                    </button>
+                </div>
+            </div>
+
+            <!-- Крок 01 (З'являється після натискання «Почати») -->
+            <div id="step-1-container" class="hidden mb-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-slate-100 text-slate-800 font-bold px-3 py-1.5 rounded-lg text-sm">01</span>
+                    <h2 class="text-xl font-bold text-slate-900">Оберіть кейс для розслідування</h2>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <label class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition-all bg-white block">
-                        <input type="radio" name="Обраний_кейс" value="Кейс 1: Сенсаційна новина без посилань" class="mb-2" required>
-                        <span class="text-xs font-bold text-slate-400 block mb-1">КЕЙС 01</span>
-                        <p class="text-sm font-medium text-slate-800">У чаті поширюють гучну «термінову» новину без жодних посилань на першоджерело.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="relative block cursor-pointer">
+                        <input type="radio" name="Кейс" value="Київстар" class="peer absolute top-5 left-5 w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer" onchange="selectCase('kyivstar')" required>
+                        <div class="pl-12 p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-blue-300 peer-checked:border-blue-500 transition-all">
+                            <span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">Кейс 01</span>
+                            <p class="text-base font-bold text-slate-900">Злам системи «Київстар» (2023)</p>
+                        </div>
                     </label>
 
-                    <label class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition-all bg-white block">
-                        <input type="radio" name="Обраний_кейс" value="Кейс 2: Прихована реклама у блогера" class="mb-2">
-                        <span class="text-xs font-bold text-slate-400 block mb-1">КЕЙС 02</span>
-                        <p class="text-sm font-medium text-slate-800">Популярний інфлюенсер нахвалює товар, але не вказує, що це партнерський матеріал.</p>
-                    </label>
-
-                    <label class="text-left p-4 rounded-xl border-2 border-slate-200 hover:border-blue-500 cursor-pointer transition-all bg-white block">
-                        <input type="radio" name="Обраний_кейс" value="Кейс 3: Маніпулятивне відео" class="mb-2">
-                        <span class="text-xs font-bold text-slate-400 block mb-1">КЕЙС 03</span>
-                        <p class="text-sm font-medium text-slate-800">Відеофрагмент із виступу викликає сумніви щодо контексту та правдивості.</p>
+                    <label class="relative block cursor-pointer">
+                        <input type="radio" name="Кейс" value="Equifax" class="peer absolute top-5 left-5 w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer" onchange="selectCase('equifax')">
+                        <div class="pl-12 p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-blue-300 peer-checked:border-blue-500 transition-all">
+                            <span class="text-xs font-bold text-slate-400 block mb-1 uppercase tracking-wide">Кейс 02</span>
+                            <p class="text-base font-bold text-slate-900">Злам агенції Equifax (2017)</p>
+                        </div>
                     </label>
                 </div>
             </div>
 
-            <!-- Блок 3: Поля вводу (textarea) для розгорнутих відповідей -->
-            <div class="mb-8">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="bg-slate-100 text-slate-700 font-bold px-2.5 py-1 rounded-lg text-sm">02</span>
-                    <h2 class="text-lg font-semibold text-slate-900">Ваші кроки та аргументи</h2>
+            <!-- БЛОК 1: З'являється після вибору кейсу (Кроки 2 і 3) -->
+            <div id="step2-and-3" class="hidden mt-10 space-y-10">
+                
+                <!-- Описи кейсів -->
+                <div id="desc-kyivstar" class="hidden bg-blue-50/70 border border-blue-100 p-6 rounded-xl text-sm md:text-base text-slate-800 leading-relaxed shadow-inner">
+                    <strong class="text-blue-900">Опис інциденту «Київстар»:</strong><br>
+                    12 грудня 2023 року відбулася масштабна атака на засоби мобільного зв'язку «Київстар». За словами представників компанії, було знищено до 70 % віртуальних серверів і комп'ютерів компанії. Близько 24 мільйонів абонентів по всій Україні залишилися без мобільного зв'язку та доступу до інтернету на кілька днів. Це також порушило роботу сирен повітряної тривоги, частини банківських терміналів і банкоматів. Для проникнення в систему, за даними СБУ, було використано скомпрометований обліковий запис одного із співробітників компанії, який не був своєчасно заблокований. До початку деструктивних дій зловмисники більше ніж пів року мали доступ до системи та готували атаку.
                 </div>
-                <p class="text-sm text-slate-600 mb-6">Опишіть алгоритм дій медіаграмотної людини у вибраній ситуації.</p>
 
-                <div class="border border-slate-200 rounded-xl p-5 mb-4 bg-slate-50/50">
-                    <div class="font-medium text-slate-900 text-sm mb-2">Крок 1: Що потрібно зробити насамперед?</div>
-                    <textarea name="Відповідь_Крок_1_Дія" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white mb-4" placeholder="Опишіть першу дію..." required></textarea>
+                <div id="desc-equifax" class="hidden bg-blue-50/70 border border-blue-100 p-6 rounded-xl text-sm md:text-base text-slate-800 leading-relaxed shadow-inner">
+                    <strong class="text-blue-900">Опис інциденту Equifax:</strong><br>
+                    2017 року хакери використали вкрадені облікові дані для доступу до інформаційної системи агентства кредитної звітності Equifax (США). Унаслідок дій кіберзлочинців було викрадено персональні дані приблизно 145,5 тисяч клієнтів агентства. Злочинці використовували викрадені дані для отримання кредитів та перерахування коштів на власні рахунки.
+                </div>
+
+                <!-- Крок 02 -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-slate-100 text-slate-800 font-bold px-3 py-1.5 rounded-lg text-sm">02</span>
+                        <h2 class="text-xl font-bold text-slate-900">Експертна карта (алгоритм аналізу)</h2>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-5">Учні спільно групою заповнюють експертну карту:</p>
+
+                    <div class="space-y-4">
+                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50">
+                            <label class="block font-medium text-slate-900 text-sm md:text-base mb-2">1. Які принципи інформаційної безпеки (доступність, цілісність чи конфіденційність) були порушені?</label>
+                            <textarea name="Відповідь_1_Принципи" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white" required></textarea>
+                        </div>
+                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50">
+                            <label class="block font-medium text-slate-900 text-sm md:text-base mb-2">2. Яку роль у цьому відіграв людський фактор (недбалість або інсайдерство)?</label>
+                            <textarea name="Відповідь_2_Людський_фактор" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white" required></textarea>
+                        </div>
+                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50">
+                            <label class="block font-medium text-slate-900 text-sm md:text-base mb-2">3. Які засоби захисту (дублювальні системи, резервне копіювання, двофакторна аутентифікація, блокування) могли б запобігти аварії?</label>
+                            <textarea name="Відповідь_3_Засоби_захисту" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Крок 03 -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-slate-100 text-slate-800 font-bold px-3 py-1.5 rounded-lg text-sm">03</span>
+                        <h2 class="text-xl font-bold text-slate-900">Експертний висновок кіберполіції</h2>
+                    </div>
+                    <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-sm">
+                        <label class="block font-medium text-slate-900 text-sm md:text-base mb-3">Сформулюйте фінальні висновки щодо інциденту:</label>
+                        <textarea id="conclusion-textarea" oninput="checkConclusion()" name="Висновок_Кіберполіції" rows="4" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-slate-50" placeholder="Почніть вводити висновок, щоб перейти до наступного кроку..." required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- БЛОК 2: З'являється ТІЛЬКИ після введення тексту в Крок 03 -->
+            <div id="step-4" class="hidden mt-10 space-y-8 animate-fade-in-up border-t border-slate-200 pt-8">
+                
+                <!-- Крок 04 (Чек-лист у вигляді таблиці за зразком) -->
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="bg-slate-100 text-slate-800 font-bold px-3 py-1.5 rounded-lg text-sm">04</span>
+                        <h2 class="text-xl font-bold text-slate-900">Формувальне оцінювання (Чек-лист аналізу кіберкейсу)</h2>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-6">(Заповнюється для самооцінювання мікрогрупою)</p>
                     
-                    <div class="font-medium text-slate-900 text-sm mb-2">Навіщо це потрібно? (Мета кроку)</div>
-                    <textarea name="Відповідь_Крок_1_Мета" rows="2" class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white" placeholder="Поясніть, яку проблему це вирішує..." required></textarea>
-                </div>
+                    <!-- Таблиця чек-листа за зразком -->
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl mb-8 shadow-sm">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 text-xs uppercase tracking-wider border-b border-slate-200">
+                                    <th class="p-4 border-r border-slate-200 w-1/2">Критерії оцінювання (Що перевіряємо?)</th>
+                                    <th class="p-4 border-r border-slate-200 text-center w-40">Рівень виконання (+1 бал — так, 0 балів — ні/частково)</th>
+                                    <th class="p-4">Коментар / Зворотний зв'язок</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-sm">
+                                <!-- Критерій 1 -->
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-4 border-r border-slate-200 text-slate-800 font-medium">
+                                        <strong>1. Розуміння принципів безпеки:</strong> правильно ідентифіковано, які саме принципи були порушені.
+                                    </td>
+                                    <td class="p-4 border-r border-slate-200 text-center align-middle">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <label class="cursor-pointer font-bold text-emerald-600"><input type="radio" name="Оцінка_Критерій_1" value="1" class="mr-1"> +1</label>
+                                            <label class="cursor-pointer font-bold text-slate-400"><input type="radio" name="Оцінка_Критерій_1" value="0" class="mr-1"> 0</label>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-middle">
+                                        <input type="text" name="Коментар_Критерій_1" placeholder="Коментар..." class="w-full p-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </td>
+                                </tr>
+                                <!-- Критерій 2 -->
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-4 border-r border-slate-200 text-slate-800 font-medium">
+                                        <strong>2. Аналіз причин (людський фактор):</strong> чітко визначено роль інсайдерських загроз та недбалості.
+                                    </td>
+                                    <td class="p-4 border-r border-slate-200 text-center align-middle">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <label class="cursor-pointer font-bold text-emerald-600"><input type="radio" name="Оцінка_Критерій_2" value="1" class="mr-1"> +1</label>
+                                            <label class="cursor-pointer font-bold text-slate-400"><input type="radio" name="Оцінка_Критерій_2" value="0" class="mr-1"> 0</label>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-middle">
+                                        <input type="text" name="Коментар_Критерій_2" placeholder="Коментар..." class="w-full p-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </td>
+                                </tr>
+                                <!-- Критерій 3 -->
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-4 border-r border-slate-200 text-slate-800 font-medium">
+                                        <strong>3. Запропоновані заходи захисту:</strong> обґрунтовано використання сучасних засобів захисту.
+                                    </td>
+                                    <td class="p-4 border-r border-slate-200 text-center align-middle">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <label class="cursor-pointer font-bold text-emerald-600"><input type="radio" name="Оцінка_Критерій_3" value="1" class="mr-1"> +1</label>
+                                            <label class="cursor-pointer font-bold text-slate-400"><input type="radio" name="Оцінка_Критерій_3" value="0" class="mr-1"> 0</label>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-middle">
+                                        <input type="text" name="Коментар_Критерій_3" placeholder="Коментар..." class="w-full p-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </td>
+                                </tr>
+                                <!-- Критерій 4 -->
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-4 border-r border-slate-200 text-slate-800 font-medium">
+                                        <strong>4. Командна робота та аргументація:</strong> злагоджено працювала група під час захисту висновку.
+                                    </td>
+                                    <td class="p-4 border-r border-slate-200 text-center align-middle">
+                                        <div class="flex items-center justify-center gap-4">
+                                            <label class="cursor-pointer font-bold text-emerald-600"><input type="radio" name="Оцінка_Критерій_4" value="1" class="mr-1"> +1</label>
+                                            <label class="cursor-pointer font-bold text-slate-400"><input type="radio" name="Оцінка_Критерій_4" value="0" class="mr-1"> 0</label>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-middle">
+                                        <input type="text" name="Коментар_Критерій_4" placeholder="Коментар..." class="w-full p-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <!-- Рядок: Кількість балів -->
+                            <tfoot>
+                                <tr class="bg-slate-100 font-bold text-slate-900 border-t border-slate-200">
+                                    <td class="p-4 border-r border-slate-200 text-right">Кількість балів:</td>
+                                    <td class="p-4 border-r border-slate-200 text-center text-blue-600 text-lg">
+                                        <span id="total-score-display">0 / 4</span>
+                                        <input type="hidden" id="total_score_input" name="Загальна_кількість_балів" value="0">
+                                    </td>
+                                    <td class="p-4 text-xs text-slate-500 font-normal">Загальний підсумок за формувальним оцінюванням</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
 
-                <div class="border border-slate-200 rounded-xl p-5 mb-4 bg-slate-50/50">
-                    <div class="font-medium text
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Кейс, що аналізувався (визначено автоматично):</label>
+                            <input type="text" id="selected_case_input" name="Аналізований_кейс" class="w-full p-3 text-sm border border-slate-200 rounded-lg bg-slate-200 text-slate-700 font-medium pointer-events-none" readonly>
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-xl transition-colors shadow-md text-base cursor-pointer">
+                            Надіслати роботу на перевірку
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>
